@@ -573,7 +573,7 @@ const SeoPage = () => {
                         <h4>Quicklinks</h4>
                         <ul>
                             <li><Link to="/AffixMedia">Home</Link></li>
-                            <li><a href="/#services">Services</a></li>
+                            <li><Link to="/AffixMedia#services">Services</Link></li>
                             <li><Link to="/WorksPage">Works</Link></li>
                             <li><a href="/BlogPage">Blogs</a></li>
                             <li><Link to="/JobsPage">Jobs</Link></li>
