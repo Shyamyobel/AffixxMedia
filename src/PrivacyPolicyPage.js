@@ -5,12 +5,29 @@ const PrivacyPolicyPage = () => {
     // State management for menus and animations
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isServicesDropdownOpen, setIsServicesDropdownOpen] = useState(false);
+    const [isMobileServicesOpen, setIsMobileServicesOpen] = useState(false);
 
     // Refs for DOM elements
-    const dropdownRef = useRef(null); // Ref to handle clicks outside the dropdown
+    const dropdownTimerRef = useRef(null); // Ref for hover-delay on dropdown
 
     const toggleMobileMenu = () => {
-        setIsMobileMenuOpen(!isMobileMenuOpen);
+        const nextState = !isMobileMenuOpen;
+        setIsMobileMenuOpen(nextState);
+        if (!nextState) {
+            setIsMobileServicesOpen(false);
+        }
+    };
+
+    // Handlers for a professional hover menu with a close delay
+    const handleMouseEnter = () => {
+        clearTimeout(dropdownTimerRef.current);
+        setIsServicesDropdownOpen(true);
+    };
+
+    const handleMouseLeave = () => {
+        dropdownTimerRef.current = setTimeout(() => {
+            setIsServicesDropdownOpen(false);
+        }, 200); // 200ms delay
     };
 
     // Data for services dropdown
@@ -40,26 +57,31 @@ const PrivacyPolicyPage = () => {
             icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" /></svg>
         },
         {
-            name: 'Influence Marketing',
+            name: 'Influencer Marketing',
             path: '/InfluenceMarketing',
             description: 'Leverage creators for authentic reach.',
-            icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9zm3.75 11.625a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
+            icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
         }
     ];
 
-    // useEffect to close dropdown when clicking outside
+    // useEffect hook to scroll to top on mount
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setIsServicesDropdownOpen(false);
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
+        window.scrollTo(0, 0);
     }, []);
+
+    // useEffect to lock body scroll when mobile menu is open
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            document.body.classList.add('no-scroll');
+        } else {
+            document.body.classList.remove('no-scroll');
+        }
+        return () => {
+            document.body.classList.remove('no-scroll');
+        };
+    }, [isMobileMenuOpen]);
 
     // Data for footer social links
     const socialLinksFooter = [
@@ -75,147 +97,27 @@ const PrivacyPolicyPage = () => {
         <div className="app">
             <style>
                 {`
-                    /* --- GILROY FONT DEFINITIONS --- */
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-Regular.ttf') format('truetype');
-                        font-weight: 400;
-                        font-style: normal;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-RegularItalic.ttf') format('truetype');
-                        font-weight: 400;
-                        font-style: italic;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-Thin.ttf') format('truetype');
-                        font-weight: 100;
-                        font-style: normal;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-ThinItalic.ttf') format('truetype');
-                        font-weight: 100;
-                        font-style: italic;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-UltraLight.ttf') format('truetype');
-                        font-weight: 200;
-                        font-style: normal;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-UltraLightItalic.ttf') format('truetype');
-                        font-weight: 200;
-                        font-style: italic;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-Light.ttf') format('truetype');
-                        font-weight: 300;
-                        font-style: normal;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-LightItalic.ttf') format('truetype');
-                        font-weight: 300;
-                        font-style: italic;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-Medium.ttf') format('truetype');
-                        font-weight: 500;
-                        font-style: normal;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-MediumItalic.ttf') format('truetype');
-                        font-weight: 500;
-                        font-style: italic;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-SemiBold.ttf') format('truetype');
-                        font-weight: 600;
-                        font-style: normal;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-SemiBoldItalic.ttf') format('truetype');
-                        font-weight: 600;
-                        font-style: italic;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-Bold.ttf') format('truetype');
-                        font-weight: 700;
-                        font-style: normal;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-BoldItalic.ttf') format('truetype');
-                        font-weight: 700;
-                        font-style: italic;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-ExtraBold.ttf') format('truetype');
-                        font-weight: 800;
-                        font-style: normal;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-ExtraBoldItalic.ttf') format('truetype');
-                        font-weight: 800;
-                        font-style: italic;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-Black.ttf') format('truetype');
-                        font-weight: 900;
-                        font-style: normal;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-BlackItalic.ttf') format('truetype');
-                        font-weight: 900;
-                        font-style: italic;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-Heavy.ttf') format('truetype');
-                        font-weight: 900;
-                        font-style: normal;
-                        font-display: swap;
-                    }
-                    @font-face {
-                        font-family: 'Gilroy';
-                        src: url('/font/Gilroy-HeavyItalic.ttf') format('truetype');
-                        font-weight: 900;
-                        font-style: italic;
-                        font-display: swap;
-                    }
+                    /* --- GILROY FONT DEFINITIONS (Full Set) --- */
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-RegularItalic.ttf') format('truetype'); font-weight: 400; font-style: italic; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-Thin.ttf') format('truetype'); font-weight: 100; font-style: normal; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-ThinItalic.ttf') format('truetype'); font-weight: 100; font-style: italic; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-UltraLight.ttf') format('truetype'); font-weight: 200; font-style: normal; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-UltraLightItalic.ttf') format('truetype'); font-weight: 200; font-style: italic; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-Light.ttf') format('truetype'); font-weight: 300; font-style: normal; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-LightItalic.ttf') format('truetype'); font-weight: 300; font-style: italic; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-Medium.ttf') format('truetype'); font-weight: 500; font-style: normal; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-MediumItalic.ttf') format('truetype'); font-weight: 500; font-style: italic; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-SemiBold.ttf') format('truetype'); font-weight: 600; font-style: normal; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-SemiBoldItalic.ttf') format('truetype'); font-weight: 600; font-style: italic; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-BoldItalic.ttf') format('truetype'); font-weight: 700; font-style: italic; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-ExtraBold.ttf') format('truetype'); font-weight: 800; font-style: normal; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-ExtraBoldItalic.ttf') format('truetype'); font-weight: 800; font-style: italic; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-Black.ttf') format('truetype'); font-weight: 900; font-style: normal; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-BlackItalic.ttf') format('truetype'); font-weight: 900; font-style: italic; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-Heavy.ttf') format('truetype'); font-weight: 900; font-style: normal; font-display: swap; }
+                    @font-face { font-family: 'Gilroy'; src: url('/font/Gilroy-HeavyItalic.ttf') format('truetype'); font-weight: 900; font-style: italic; font-display: swap; }
 
                     /* --- GLOBAL STYLES --- */
                     :root {
@@ -233,27 +135,17 @@ const PrivacyPolicyPage = () => {
                         background-color: var(--brand-light);
                     }
                     .app { min-height: 100vh; display: flex; flex-direction: column; }
-
+                    .no-scroll { overflow: hidden; }
+                    main { flex-grow: 1; }
+                    
                     /* --- HEADER & NAV --- */
-                    .header {
-                        position: relative;
-                        background-color: var(--brand-light);
-                        padding: 0.5rem 1.5rem;
-                        z-index: 50;
-                    }
+                    .header { position: relative; background-color: var(--brand-light); padding: 0.5rem 1.5rem; z-index: 50; }
                     .nav-container { display: flex; align-items: center; max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
                     .logo { font-size: 1.5rem; font-weight: 700; color: var(--brand-primary); text-decoration: none; }
                     .nav-links-center { display: none; gap: 3rem; margin: 0 auto; transform: translateX(7rem); }
                     .nav-links-center a, .nav-contact-link, .services-dropdown-trigger {
-                        text-decoration: none;
-                        color: var(--brand-dark);
-                        font-weight: 500;
-                        font-size: 18px;
-                        transition: color 0.3s ease;
-                        padding: 0.5rem 0;
-                        background: none;
-                        border: none;
-                        font-family: inherit;
+                        text-decoration: none; color: var(--brand-dark); font-weight: 500; font-size: 18px; transition: color 0.3s ease;
+                        padding: 0.5rem 0; background: none; border: none; font-family: inherit;
                     }
                     .nav-links-center a:hover, .nav-contact-link:hover, .services-dropdown-trigger:hover { color: var(--brand-primary); }
                     .nav-right { display: flex; align-items: center; margin-left: auto; }
@@ -261,176 +153,66 @@ const PrivacyPolicyPage = () => {
                     .mobile-menu-button-container { display: block; }
                     .mobile-menu-button { background: none; border: none; cursor: pointer; padding: 0.5rem; }
                     .hamburger-icon { width: 24px; height: 24px; color: var(--brand-dark); }
-
+                    
                     /* --- ENHANCED DROPDOWN STYLES --- */
-                    @keyframes slickFadeInUp {
-                        from { opacity: 0; transform: translateY(-10px) scale(0.98); }
-                        to { opacity: 1; transform: translateY(0) scale(1); }
-                    }
-
-                    .services-dropdown-container {
-                        position: relative;
-                        display: inline-block;
-                    }
-
-                    .services-dropdown-trigger {
-                        cursor: pointer;
-                        display: flex;
-                        align-items: center;
-                        gap: 0.25rem;
-                    }
-
+                    @keyframes slickFadeInUp { from { opacity: 0; transform: translateY(-10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+                    .services-dropdown-container { position: relative; display: inline-block; }
+                    .services-dropdown-trigger { cursor: pointer; display: flex; align-items: center; gap: 0.25rem; }
                     .dropdown-menu {
-                        position: absolute;
-                        top: calc(100% + 15px);
-                        left: 0;
-                        background-color: var(--brand-light);
-                        border-radius: 12px;
-                        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1), 0 5px 15px -5px rgba(0, 0, 0, 0.05);
-                        z-index: 1000;
-                        width: 320px;
-                        padding: 8px;
-                        list-style: none;
-                        border: 1px solid var(--divider-gray);
-                        transform-origin: top center;
-                        animation: slickFadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                        position: absolute; top: calc(100% + 15px); left: 0; background-color: var(--brand-light);
+                        border-radius: 12px; box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1), 0 5px 15px -5px rgba(0, 0, 0, 0.05);
+                        z-index: 1000; width: 320px; padding: 8px; list-style: none; border: 1px solid var(--divider-gray);
+                        transform-origin: top center; animation: slickFadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
                     }
-
                     .dropdown-menu::before {
-                        content: '';
-                        position: absolute;
-                        top: -6px;
-                        left: 35px;
-                        transform: translateX(-50%) rotate(45deg);
-                        width: 10px;
-                        height: 10px;
-                        background-color: var(--brand-light);
-                        border-top: 1px solid var(--divider-gray);
+                        content: ''; position: absolute; top: -6px; left: 35px; transform: translateX(-50%) rotate(45deg);
+                        width: 10px; height: 10px; background-color: var(--brand-light); border-top: 1px solid var(--divider-gray);
                         border-left: 1px solid var(--divider-gray);
                     }
-
                     .dropdown-item {
-                        display: flex;
-                        align-items: center;
-                        gap: 12px;
-                        padding: 10px;
-                        text-decoration: none;
-                        border-radius: 8px;
-                        transition: background-color 0.2s ease, transform 0.2s ease;
+                        display: flex; align-items: center; gap: 12px; padding: 10px; text-decoration: none;
+                        border-radius: 8px; transition: background-color 0.2s ease, transform 0.2s ease;
                     }
-
-                    .dropdown-item:hover {
-                        background-color: var(--secondary-light-gray);
-                        transform: translateX(4px);
-                    }
-
-                    .dropdown-item-icon {
-                        flex-shrink: 0;
-                        width: 28px;
-                        height: 28px;
-                        color: var(--brand-primary);
-                    }
-
-                    .dropdown-item-text h4 {
-                        font-size: 16px;
-                        font-weight: 600;
-                        color: var(--brand-dark);
-                        margin: 0 0 2px;
-                    }
-
-                    .dropdown-item-text p {
-                        font-size: 13px;
-                        color: #6B7280;
-                        margin: 0;
-                        font-weight: 400;
-                        line-height: 1.4;
-                    }
-
-                    .dropdown-divider {
-                        height: 1px;
-                        background-color: var(--divider-gray);
-                        margin: 6px 10px;
-                    }
-
-                    /* --- MOBILE MENU & REST OF PAGE --- */
-                    .nav-links-mobile { background-color: var(--brand-light); padding: 1rem; display: flex; flex-direction: column; text-align: center; }
-                    .nav-links-mobile a { text-decoration: none; color: var(--brand-dark); font-size: 18px; padding: 0.75rem 0; border-bottom: 1px solid var(--secondary-light-gray); }
-                    .mobile-services-list .services-title { font-weight: 600; color: var(--brand-dark); padding: 0.75rem 0; border-bottom: 1px solid var(--secondary-light-gray); font-size: 18px; }
-                    .mobile-services-list .mobile-service-item { padding-left: 1.5rem; font-size: 16px; color: #555; }
-                    main { flex-grow: 1; }
+                    .dropdown-item:hover { background-color: var(--secondary-light-gray); transform: translateX(4px); }
+                    .dropdown-item-icon { flex-shrink: 0; width: 28px; height: 28px; color: var(--brand-primary); }
+                    .dropdown-item-text h4 { font-size: 16px; font-weight: 600; color: var(--brand-dark); margin: 0 0 2px; }
+                    .dropdown-item-text p { font-size: 13px; color: #6B7280; margin: 0; font-weight: 400; line-height: 1.4; }
+                    .dropdown-divider { height: 1px; background-color: var(--divider-gray); margin: 6px 10px; }
                     
+                    /* --- PROFESSIONAL MOBILE MENU STYLES --- */
+                    .mobile-menu-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 60; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s; }
+                    .mobile-menu-backdrop.open { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
+                    .mobile-menu-panel { position: fixed; top: 0; right: 0; width: 85%; max-width: 350px; height: 100%; background-color: var(--brand-light); box-shadow: -5px 0 15px rgba(0,0,0,0.1); z-index: 70; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column; }
+                    .mobile-menu-panel.open { transform: translateX(0); }
+                    .mobile-menu-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid var(--divider-gray); }
+                    .mobile-menu-header .logo { font-size: 1.25rem; }
+                    .close-menu-button { background: none; border: none; padding: 0.5rem; cursor: pointer; }
+                    .close-icon { width: 28px; height: 28px; color: var(--brand-dark); }
+                    .mobile-nav-links { padding: 1rem 1.5rem; list-style: none; margin: 0; flex-grow: 1; overflow-y: auto; }
+                    .mobile-nav-links a { display: block; text-decoration: none; color: var(--brand-dark); font-size: 1.1rem; font-weight: 500; padding: 1rem 0.5rem; border-radius: 6px; transition: background-color 0.2s ease, color 0.2s ease; }
+                    .mobile-nav-links a:hover { background-color: var(--secondary-light-gray); color: var(--brand-primary); }
+                    .mobile-services-toggle { display: flex; justify-content: space-between; align-items: center; width: 100%; font-size: 1.1rem; font-weight: 500; padding: 1rem 0.5rem; background: none; border: none; text-align: left; font-family: inherit; color: var(--brand-dark); cursor: pointer; }
+                    .chevron-icon { width: 16px; height: 16px; transition: transform 0.3s ease; }
+                    .chevron-icon.open { transform: rotate(180deg); }
+                    .mobile-submenu { list-style: none; padding-left: 1.5rem; margin: 0; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
+                    .mobile-submenu.open { max-height: 500px; }
+                    .mobile-submenu a { font-size: 1rem; font-weight: 400; color: #4B5563; padding-top: 0.75rem; padding-bottom: 0.75rem; }
+                    .mobile-menu-footer { padding: 1.5rem; margin-top: auto; border-top: 1px solid var(--divider-gray); }
+                    .mobile-contact-button { display: block; width: 100%; padding: 0.75rem 1.5rem; background-color: var(--brand-primary); color: var(--brand-light); text-align: center; text-decoration: none; border-radius: 9999px; font-weight: 600; transition: opacity 0.3s ease; }
+                    .mobile-contact-button:hover { opacity: 0.9; }
+
                     /* --- PRIVACY POLICY STYLES --- */
-                    .privacy-policy-section {
-                        padding: 3rem 1.5rem;
-                        max-width: 900px;
-                        margin: 0 auto;
-                        font-size: 18px;
-                        line-height: 1.6;
-                    }
-
-                    .privacy-policy-section h1 {
-                        font-size: clamp(2.5rem, 6vw, 4.0625rem);
-                        font-weight: 600;
-                        color: var(--brand-primary);
-                        margin: 0 0 1rem;
-                    }
+                    .privacy-policy-section { padding: 3rem 1.5rem; max-width: 900px; margin: 0 auto; font-size: 18px; line-height: 1.6; }
+                    .privacy-policy-section h1 { font-size: clamp(2.5rem, 6vw, 4.0625rem); font-weight: 600; color: var(--brand-primary); margin: 0 0 1rem; }
+                    .privacy-policy-section .effective-date { font-size: 20px; color: var(--brand-dark); font-weight: 500; margin-bottom: 2rem; }
+                    .privacy-policy-section h2 { font-size: 28px; font-weight: 600; color: var(--brand-dark); margin: 2rem 0 0.5rem; }
+                    .privacy-policy-section p, .privacy-policy-section ul { font-size: 18px; font-weight: 400; color: var(--brand-dark); line-height: 1.6; margin-bottom: 1rem; }
+                    .privacy-policy-section ul { list-style-type: disc; padding-left: 2rem; }
+                    .privacy-policy-section li { margin-bottom: 0.5rem; }
+                    .privacy-policy-section a { color: var(--brand-primary); text-decoration: underline; }
+                    .privacy-policy-section hr { border: none; border-top: 1px solid #E5E7EB; margin: 3rem 0; }
                     
-                    .privacy-policy-section .effective-date {
-                        font-size: 20px;
-                        color: var(--brand-dark);
-                        font-weight: 500;
-                        margin-bottom: 2rem;
-                    }
-                    
-                    .privacy-policy-section h2 {
-                        font-size: 28px;
-                        font-weight: 600;
-                        color: var(--brand-primary);
-                        margin: 2rem 0 0.5rem;
-                        position: relative;
-                        padding-left: 20px; /* Space for the number */
-                    }
-                    
-                    .privacy-policy-section h2::before {
-                        content: attr(data-number);
-                        position: absolute;
-                        left: 0;
-                        top: 0;
-                        color: var(--brand-primary);
-                        font-weight: 700;
-                        font-size: 1.5em;
-                        opacity: 0.5;
-                    }
-
-                    .privacy-policy-section p, .privacy-policy-section ul {
-                        font-size: 18px;
-                        font-weight: 400;
-                        color: var(--brand-dark);
-                        line-height: 1.6;
-                        margin-bottom: 1rem;
-                    }
-                    
-                    .privacy-policy-section ul {
-                        list-style-type: disc;
-                        padding-left: 2rem;
-                    }
-
-                    .privacy-policy-section li {
-                        margin-bottom: 0.5rem;
-                    }
-
-                    .privacy-policy-section a {
-                        color: var(--brand-primary);
-                        text-decoration: underline;
-                    }
-
-                    .privacy-policy-section hr {
-                        border: none;
-                        border-top: 1px solid #E5E7EB;
-                        margin: 3rem 0;
-                    }
-                    
-                    /* --- FOOTER STYLES (Copied from Home Page) --- */
+                    /* --- FOOTER STYLES --- */
                     .footer { background-color: #1a1a1a; background-image: linear-gradient(to top left, rgba(255, 255, 255, 0.05) 49.9%, transparent 50%), linear-gradient(to bottom right, rgba(255, 255, 255, 0.03) 49.9%, transparent 50%); color: #EAEAEA; padding: 4rem 1.5rem 1.5rem; margin-top: auto; font-size: 14px; font-weight: 300; }
                     .footer-container { max-width: 1280px; margin: 0 auto; display: grid; gap: 2rem; grid-template-columns: 1fr; }
                     .footer-column .footer-logo-img { width: 120px; height: auto; margin-bottom: 1rem; }
@@ -444,7 +226,7 @@ const PrivacyPolicyPage = () => {
                     .footer-copyright { text-align: center; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 12px; color: #A0A0A0; }
 
                     @media (min-width: 768px) {
-                        .mobile-menu-button-container, .nav-links-mobile { display: none; }
+                        .mobile-menu-button-container { display: none; }
                         .nav-links-center { display: flex; align-items: center; }
                         .nav-contact-link { display: block; }
                         .footer-container { grid-template-columns: 1.5fr 1fr 1fr 1fr; }
@@ -458,11 +240,12 @@ const PrivacyPolicyPage = () => {
                     <div className="nav-links-center">
                         <Link to="/AffixMedia">Home</Link>
                         
-                        <div className="services-dropdown-container" ref={dropdownRef}>
-                            <button
-                                className="services-dropdown-trigger"
-                                onClick={() => setIsServicesDropdownOpen(!isServicesDropdownOpen)}
-                            >
+                        <div 
+                            className="services-dropdown-container"
+                            onMouseEnter={handleMouseEnter}
+                            onMouseLeave={handleMouseLeave}
+                        >
+                            <button className="services-dropdown-trigger">
                                 Services
                             </button>
                             {isServicesDropdownOpen && (
@@ -486,7 +269,8 @@ const PrivacyPolicyPage = () => {
                                 </div>
                             )}
                         </div>
-<Link to="/WorksPage">Works</Link>
+
+                        <Link to="/WorksPage">Works</Link>
                         <a href="/BlogPage">Blogs</a>
                         <Link to="/JobsPage">Jobs</Link>
                     </div>
@@ -501,28 +285,40 @@ const PrivacyPolicyPage = () => {
                         </div>
                     </div>
                 </nav>
-                {isMobileMenuOpen && (
-                    <div className="nav-links-mobile">
-                        <Link to="/AffixMedia" onClick={toggleMobileMenu}>Home</Link>
-                        <div className="mobile-services-list">
-                            <div className="services-title">Services</div>
-                            {servicesLinks.map((service) => (
-                                <Link
-                                    key={service.name}
-                                    to={service.path}
-                                    className="mobile-service-item"
-                                    onClick={toggleMobileMenu}
-                                >
-                                    {service.name}
-                                </Link>
-                            ))}
+
+                {/* --- REWORKED MOBILE MENU PANEL --- */}
+                <div className={`mobile-menu-backdrop ${isMobileMenuOpen ? 'open' : ''}`} onClick={toggleMobileMenu}>
+                    <div className={`mobile-menu-panel ${isMobileMenuOpen ? 'open' : ''}`} onClick={(e) => e.stopPropagation()}>
+                        <div className="mobile-menu-header">
+                            <Link to="/AffixMedia" className="logo" onClick={toggleMobileMenu}>AffixxMedia</Link>
+                            <button onClick={toggleMobileMenu} className="close-menu-button" aria-label="Close menu">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="close-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
-                        <Link to="/WorksPage" onClick={toggleMobileMenu}>Works</Link>
-                        <a href="/BlogPage" onClick={toggleMobileMenu}>Blogs</a>
-                        <Link to="/JobsPage" onClick={toggleMobileMenu}>Jobs</Link>
-                        <a href="https://whatsform.com/FLt6zu" target="_blank" rel="noopener noreferrer" onClick={toggleMobileMenu}>Contact</a>
+                        <ul className="mobile-nav-links">
+                            <li><Link to="/AffixMedia" onClick={toggleMobileMenu}>Home</Link></li>
+                            <li>
+                                <button className="mobile-services-toggle" onClick={() => setIsMobileServicesOpen(!isMobileServicesOpen)}>
+                                    <span>Services</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className={`chevron-icon ${isMobileServicesOpen ? 'open' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                                </button>
+                                <ul className={`mobile-submenu ${isMobileServicesOpen ? 'open' : ''}`}>
+                                    {servicesLinks.map(service => (
+                                        <li key={service.name}><Link to={service.path} onClick={toggleMobileMenu}>{service.name}</Link></li>
+                                    ))}
+                                </ul>
+                            </li>
+                            <li><Link to="/WorksPage" onClick={toggleMobileMenu}>Works</Link></li>
+                            <li><a href="/BlogPage" onClick={toggleMobileMenu}>Blogs</a></li>
+                            <li><Link to="/JobsPage" onClick={toggleMobileMenu}>Jobs</Link></li>
+                        </ul>
+                        <div className="mobile-menu-footer">
+                            <a href="https://whatsform.com/FLt6zu" target="_blank" rel="noopener noreferrer" className="mobile-contact-button" onClick={toggleMobileMenu}>Contact</a>
+                        </div>
                     </div>
-                )}
+                </div>
             </header>
 
             <main className="main-content">
@@ -595,7 +391,7 @@ const PrivacyPolicyPage = () => {
                         <h4>Connect</h4>
                         <div className="footer-social-links">
                             {socialLinksFooter.map((link) => (
-                                <a key={link.name} href={link.href} aria-label={link.name}>
+                                <a key={link.name} href={link.href} aria-label={link.name} target="_blank" rel="noopener noreferrer">
                                     {link.icon}
                                 </a>
                             ))}
@@ -606,7 +402,7 @@ const PrivacyPolicyPage = () => {
                         <ul>
                             <li><Link to="/PrivacyPolicyPage">Privacy Policy</Link></li>
                             <li><Link to="/TermsAndConditionsPage">Terms & Conditions</Link></li>
-                            <li><Link to="/sitemap">Sitemap</Link></li>
+                            
                         </ul>
                     </div>
                 </div>

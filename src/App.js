@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ScrollToTop from './ScrollToTop';
 import HomePage from './HomePage';
 import JobsPage from './JobsPage';
 import SmmPage from './SmmPage';
@@ -14,6 +15,7 @@ import WorksPage from './WorksPage';
 const App = () => {
     return (
         <Router>
+            <ScrollToTop />
             <Routes>
                 <Route path="/AffixMedia" element={<HomePage />} />
                 <Route path="/JobsPage" element={<JobsPage />} />
