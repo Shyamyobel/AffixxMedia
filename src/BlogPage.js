@@ -9,7 +9,7 @@ const blogPosts = [
         id: 1, 
         category: 'Social Media', 
         title: 'Social Media Marketing: The 2025 Game-Changer for Businesses & Careers', 
-        summary: 'Social media in 2025 is no longer about simple brand visibility — it’s about community, storytelling, and measurable impact. Platforms like Instagram Reels, YouTube Shorts, and LinkedIn thought-leadership posts dominate digital conversations.', 
+        summary: 'Social media in 2025 is no longer about simple brand visibility — it’s about community, storytelling, and measurable impact. ', 
         fullContent: `
             <p><strong>The New Wave of Social Media in 2025</strong></p>
             <p>Social media in 2025 is no longer about simple brand visibility — it’s about community, storytelling, and measurable impact. Platforms like Instagram Reels, YouTube Shorts, and LinkedIn thought-leadership posts dominate digital conversations. But the biggest trend today is AI-powered content personalization. Brands can now deliver hyper-relevant videos, ads, and posts to audiences based on behavior, interests, and even mood. Short-form content, live sessions, and interactive polls are gaining massive traction because they keep users engaged for longer.</p>
@@ -546,13 +546,13 @@ const BlogPage = () => {
                     /* REMOVED: Hover styles handled by motion component */
                     .card-header { padding: 0.75rem 1rem; color: var(--brand-light); display: flex; justify-content: flex-start; font-weight: 600; font-size: 14px; }
                     .card-category { padding: 2px 8px; border-radius: 4px; background-color: var(--brand-primary); }
-                    .card-body { padding: 1.5rem 1.25rem; display: flex; flex-direction: column; }
+                    .card-body { padding: 1.5rem 1.25rem; display: flex; flex-direction: column; .card-body}
                     .card-body h4 { font-size: 20px; font-weight: 700; color: var(--brand-dark); margin: 0 0 0.5rem; line-height: 1.4; }
                     .card-body p { font-size: 16px; color: #6B7280; margin-bottom: 1.5rem; line-height: 1.5; }
                     .full-content-container { overflow: hidden; /* Important for framer motion height: auto */ border-top: 1px solid var(--divider-gray); }
                     .full-content-container p { margin-top: 0.75rem; margin-bottom: 0.75rem; font-size: 16px; }
                     .full-content-container strong { color: var(--brand-primary); font-weight: 700; display: block; margin-top: 1.5rem; }
-                    .read-more-button { align-self: flex-start; background: none; border: none; cursor: pointer; font-size: 16px; font-weight: 600; color: var(--brand-primary); padding: 0.5rem 0; margin-top: 0.5rem; }
+                    .read-more-button { align-self: flex-start; background: none; border: none; cursor: pointer; font-size: 16px; font-weight: 600; color: var(--brand-primary); padding: 0.5rem 0; margin-top: auto; }
                     
                     /* Media Queries (Unchanged) */
                     @media (min-width: 768px) {

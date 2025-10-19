@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -9,70 +9,64 @@ const HomePage = () => {
     const [activeValueIndex, setActiveValueIndex] = useState(0);
     const [isMobileServicesOpen, setIsMobileServicesOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [activeHeroIndex, setActiveHeroIndex] = useState(0); // State for cycling hero text
+    const [activeHeroIndex, setActiveHeroIndex] = useState(0);
 
     // --- REFS ---
     const coreValuesRef = useRef(null);
-    const [isCoreValuesVisible, setIsCoreValuesVisible] = useState(false);
     const dropdownTimerRef = useRef(null);
+    const intervalRef = useRef(null);
+    const timeoutRef = useRef(null);
+
+    // --- DATA ---
+    const coreValues = [
+        { title: "Collaboration Wins", description: "We believe anyone can succeed with the right team, and we strive to be that team for every client." },
+        { title: "Integrity in Value", description: "We welcome negotiation in strategies, never in the value we deliver." },
+        { title: "Mutual Understanding", description: "We understand our clients and help them clearly understand the process, goals, and results." },
+        { title: "Creative Clarity", description: "We combine bold ideas with strategic focus — because creativity without purpose is just noise." },
+        { title: "Results Matter", description: "Our success is measured by the impact we create for our clients, not by vanity metrics." },
+        { title: "Transparency Always", description: "We believe in open communication, honest feedback, and earning trust through every interaction." }
+    ];
 
     // --- ANIMATION VARIANTS ---
     const staggerContainer = {
         hidden: {},
         show: {
-            transition: {
-                staggerChildren: 0.15,
-                delayChildren: 0.2,
-            },
+            transition: { staggerChildren: 0.15, delayChildren: 0.2, },
         },
     };
-
     const fadeInUp = {
         hidden: { y: 60, opacity: 0 },
         show: { y: 0, opacity: 1, transition: { duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99] } },
     };
-    
     const fadeInLeft = {
         hidden: { x: -80, opacity: 0, rotate: -3 },
         show: { x: 0, opacity: 1, rotate: 0, transition: { duration: 1, ease: [0.6, -0.05, 0.01, 0.99] } },
     };
-
     const fadeInRight = {
         hidden: { x: 80, opacity: 0, rotate: 3 },
         show: { x: 0, opacity: 1, rotate: 0, transition: { duration: 1, ease: [0.6, -0.05, 0.01, 0.99] } },
     };
-    
-    // For the hero title word-by-word animation
     const heroTitleVariants = {
         hidden: {},
         show: {
-            transition: {
-                staggerChildren: 0.1,
-                delayChildren: 0.4,
-            },
+            transition: { staggerChildren: 0.1, delayChildren: 0.4, },
         },
     };
     const letterVariant = {
         hidden: { opacity: 0, y: '100%' },
         show: { opacity: 1, y: '0%', transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } },
     };
-
-    // Stagger container for the new services grid
     const servicesGridStagger = {
         hidden: {},
         show: {
-            transition: {
-                staggerChildren: 0.1,
-            },
+            transition: { staggerChildren: 0.1, },
         },
     };
 
-    // --- DATA ---
     const heroContent = [
         { title: "Brand Promise", subtitle: "Strategic clarity. Creative impact. Real results." },
         { title: "Teamwork", subtitle: "When you reach out, we’re ready to roll. We don’t wait, we act." }
     ];
-
     const servicesLinks = [
         { name: 'Social Media Marketing', path: '/SocialMediaMarketing', description: 'Amplify your voice across social channels.', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z" /></svg> },
         { name: 'Personal Branding', path: '/PersonalBranding', description: 'Craft your unique professional identity.', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg> },
@@ -85,36 +79,50 @@ const HomePage = () => {
         { name: 'Instagram', icon: <svg viewBox="0 0 24 24" fill="currentColor" height="1em" width="1em"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.584.069-4.85c.149-3.225 1.664 4.771 4.919-4.919C8.416 2.175 8.796 2.163 12 2.163m0-2.163C8.74 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.74 0 12s.014 3.667.072 4.947c.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.74 24 12 24s3.667-.014 4.947-.072c4.358-.2 6.78-2.618 6.98-6.98C23.986 15.667 24 15.26 24 12s-.014-3.667-.072-4.947c-.2-4.358-2.618-6.78-6.98-6.98C15.667.014 15.26 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z" /></svg>, href: 'https://www.instagram.com/affixxmedia/' },
         { name: 'WhatsApp', icon: <svg viewBox="0 0 24 24" fill="currentColor" height="1em" width="1em"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2m.01 18.01c-1.5 0-2.96-.4-4.22-1.13l-.3-.18-3.12.82.83-3.04-.2-.31a8.26 8.26 0 01-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24s8.24 3.7 8.24 8.24-3.7 8.24-8.23 8.24m4.52-6.14c-.25-.12-1.47-.72-1.7-.82s-.39-.12-.56.12-.64.82-.79.98-.29.18-.54.06c-.25-.12-1.06-.39-2.02-1.25-.75-.67-1.25-1.49-1.4-1.74s-.02-.38.11-.51c.11-.11.25-.29.37-.43s.16-.25.25-.41.04-.3-.02-.43c-.06-.12-.56-1.34-.76-1.84s-.4-.42-.55-.43h-.48c-.18 0-.47.06-.71.31s-.91.89-.91 2.16.93 2.5 1.06 2.68c.12.18 1.81 2.76 4.39 3.82.62.25 1.1.4 1.48.51.54.17.95.15 1.3.1.39-.06 1.47-.6 1.68-1.18s.21-1.07.15-1.18c-.06-.12-.23-.18-.48-.3z" /></svg>, href: 'https://wa.me/919363771010?text=Hi%20AffixxMedia%2C%20I%27d%20like%20to%20know%20more%20about%20your%20marketing%20services' },
         { name: 'LinkedIn', icon: <svg viewBox="0 0 24 24" fill="currentColor" height="1em" width="1em"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667h-3.556V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg>, href: 'https://www.linkedin.com/company/affixxmedia/' },
-        { name: 'YouTube', icon: <svg viewBox="0 0 24 24" fill="currentColor" height="1em" width="1em"><path d="M21.582 7.243c-.24-.877-.91-1.545-1.79-1.784C18.25 5 12 5 12 5s-6.25 0-7.792.459c-.882-.239-1.55-.907-1.79 1.784C2 8.745 2 12 2 12s0 3.255.418 4.757c.24.877.908 1.545 1.79 1.784C5.75 19 12 19 12 19s6.25 0 7.792-.459c.882-.239 1.55-.907 1.79-1.784C22 15.255 22 12 22 12s0-3.255-.418-4.757zM9.75 15.115V8.885L15.445 12 9.75 15.115z" /></svg>, href: 'https://youtube.com/@affixxmedia?si=Ha_c7cy7UISl2Z4H' },
+        { name: 'YouTube', icon: <svg viewBox="0 0 24 24" fill="currentColor" height="1em" width="1em"><path d="M21.582 7.243c-.24-.877-.91-1.545-1.79-1.784C18.25 5 12 5 12 5s-6.25 0-7.792.459c-.882-.239-1.55-.907-1.79 1.784C2 8.745 2 12 2 12s0 3.255.418 4.757c.24.877.908 1.545 1.79 1.784C5.75 19 12 19 12 19s6.25 0 7.792-.459c.882-.239 1.55-.907-1.79-1.784C22 15.255 22 12 22 12s0-3.255-.418-4.757zM9.75 15.115V8.885L15.445 12 9.75 15.115z" /></svg>, href: 'https://youtube.com/@affixxmedia?si=Ha_c7cy7UISl2Z4H' },
         { name: 'Twitter', icon: <svg viewBox="0 0 24 24" fill="currentColor" height="1em" width="1em"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>, href: 'https://x.com/affixxmedia?s=21' },
     ];
     
-    // --- EVENT HANDLERS ---
+    // --- EVENT HANDLERS & LOGIC ---
     const toggleMobileMenu = () => {
         const nextState = !isMobileMenuOpen;
         setIsMobileMenuOpen(nextState);
-        if (!nextState) {
-            setIsMobileServicesOpen(false);
-        }
+        if (!nextState) setIsMobileServicesOpen(false);
     };
     const handleMouseEnter = () => {
         clearTimeout(dropdownTimerRef.current);
         setIsServicesDropdownOpen(true);
     };
     const handleMouseLeave = () => {
-        dropdownTimerRef.current = setTimeout(() => {
-            setIsServicesDropdownOpen(false);
-        }, 200);
+        dropdownTimerRef.current = setTimeout(() => setIsServicesDropdownOpen(false), 200);
     };
 
+    // --- CORE VALUES SCROLLING LOGIC (CORRECTED) ---
+    const stopAutoScroll = useCallback(() => {
+        clearInterval(intervalRef.current);
+        clearTimeout(timeoutRef.current);
+    }, []);
+
+    const startAutoScroll = useCallback(() => {
+        stopAutoScroll();
+        intervalRef.current = setInterval(() => {
+            setActiveValueIndex(prev => (prev + 1) % coreValues.length);
+        }, 2500); // Changed to 2.5 seconds
+    }, [coreValues.length, stopAutoScroll]);
+
+    const handleValueCardClick = useCallback((index) => {
+        stopAutoScroll();
+        setActiveValueIndex(index);
+        timeoutRef.current = setTimeout(startAutoScroll, 5000);
+    }, [startAutoScroll, stopAutoScroll]);
+    
     // --- USEEFFECT HOOKS ---
     useEffect(() => {
         window.scrollTo(0, 0);
-        const timer = setTimeout(() => setIsLoading(false), 2500); // Extended for a smoother reveal
+        const timer = setTimeout(() => setIsLoading(false), 2500);
         return () => clearTimeout(timer);
     }, []);
 
-    // Hero text cycling
     useEffect(() => {
         if (isLoading) return;
         const heroInterval = setInterval(() => {
@@ -123,47 +131,40 @@ const HomePage = () => {
         return () => clearInterval(heroInterval);
     }, [isLoading, heroContent.length]);
     
-    // Observer for triggering auto-cycling core values
+    // Effect to start auto-scroll when page has loaded
     useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => setIsCoreValuesVisible(entry.isIntersecting),
-            { root: null, rootMargin: '0px', threshold: 0.5 }
-        );
-        if (coreValuesRef.current) observer.observe(coreValuesRef.current);
+        if (!isLoading) {
+            startAutoScroll();
+        }
         return () => {
-            if (coreValuesRef.current) observer.unobserve(coreValuesRef.current);
+            stopAutoScroll();
         };
-    }, []);
+    }, [isLoading, startAutoScroll, stopAutoScroll]);
 
-    // Auto-cycling core values logic
+    // Effect to scroll the active card into view
     useEffect(() => {
-        if (!isCoreValuesVisible) return;
-        const intervalId = setInterval(() => {
-            setActiveValueIndex(prevIndex => (prevIndex + 1) % 6);
-        }, 3500);
-        return () => clearInterval(intervalId);
-    }, [isCoreValuesVisible]);
-
-    // Scrolling active core value card into view
-    useEffect(() => {
-        if (coreValuesRef.current && isCoreValuesVisible) {
-            const activeCard = coreValuesRef.current.querySelector(`.value-card:nth-child(${activeValueIndex + 1})`);
+        if (coreValuesRef.current) {
+            const container = coreValuesRef.current;
+            const activeCard = container.querySelector(`.value-card:nth-child(${activeValueIndex + 1})`);
+            
             if (activeCard) {
-                activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                const containerWidth = container.offsetWidth;
+                const cardLeft = activeCard.offsetLeft;
+                const cardWidth = activeCard.offsetWidth;
+                
+                const scrollToPosition = cardLeft - (containerWidth / 2) + (cardWidth / 2);
+
+                container.scrollTo({
+                    left: scrollToPosition,
+                    behavior: 'smooth'
+                });
             }
         }
-    }, [activeValueIndex, isCoreValuesVisible]);
+    }, [activeValueIndex]);
     
-    // Body scroll lock for mobile menu or preloader
     useEffect(() => {
-        if (isMobileMenuOpen || isLoading) {
-            document.body.classList.add('no-scroll');
-        } else {
-            document.body.classList.remove('no-scroll');
-        }
-        return () => {
-            document.body.classList.remove('no-scroll');
-        };
+        document.body.style.overflow = (isMobileMenuOpen || isLoading) ? 'hidden' : 'auto';
+        return () => { document.body.style.overflow = 'auto'; };
     }, [isMobileMenuOpen, isLoading]);
 
     return (
@@ -180,11 +181,12 @@ const HomePage = () => {
                     html { scroll-behavior: smooth; }
                     body { margin: 0; font-family: 'Gilroy', sans-serif; font-weight: 400; color: var(--brand-dark); background-color: var(--brand-light); }
                     .app { min-height: 100vh; display: flex; flex-direction: column; }
-                    .no-scroll { overflow: hidden; }
                     
                     /* --- ENHANCED PRELOADER STYLES --- */
                     .preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; z-index: 9999; }
                     .loader-panel { width: 100%; height: 100%; background-color: var(--brand-dark); display: flex; justify-content: center; align-items: center; }
+                    .loader-content { display: flex; flex-direction: column; align-items: center; }
+                    .loader-logo { width: 120px; height: auto; margin-bottom: 1rem; }
                     .loader-text { color: var(--brand-primary); font-size: 2rem; font-weight: 700; }
 
                     /* --- HEADER & NAV --- */
@@ -238,8 +240,8 @@ const HomePage = () => {
                     .logo, .hero-text h2, .connecting-text h3, .services-section h2, .about-content h2, .core-values-section h2 { color: var(--brand-primary); }
                     .heading-thin-black { color: var(--brand-dark); font-weight: 300; }
                     .hero-section { padding-top: 1rem; max-width: 100%; margin: 0 auto; }
-                    .hero-content { display: flex; flex-direction: column; justify-content: flex-start; align-items: center; max-width: 1280px; margin: 0 auto; position: relative; min-height: 550px; background-image: url('/Affexmedia icons/Landing page girl.png'); background-repeat: no-repeat; margin-bottom: 1rem; background-size: 90% auto; background-position: center bottom; padding: 0 1.5rem; }
-                    .hero-text { text-align: center; z-index: 10; padding: 1rem; width: 90%; align-self: center; height: 150px; } /* Set fixed height for cycle animation */
+                    .hero-content { display: flex; flex-direction: column; justify-content: flex-start; align-items: center; max-width: 1280px; margin: 0 auto; position: relative; min-height: 550px; background-image: url('/Affexmedia icons/Landing page girl.png'); background-repeat: no-repeat; margin-bottom: 1rem; background-size: 90% auto; background-position: calc(50% - 5px) bottom; padding: 0 1.5rem; }
+                    .hero-text { text-align: center; z-index: 10; padding: 1rem; width: 90%; align-self: center; height: 150px; } 
                     .hero-text h2 { font-weight: 600; font-size: clamp(2rem, 7vw, 3rem); margin-bottom: 0.5rem; }
                     .hero-text p { font-weight: 500; font-size: clamp(1rem, 4vw, 1.5rem); color: var(--brand-dark); }
                     .connecting-text-container { position: relative; text-align: center; background-color: var(--secondary-light-gray); width: 100%; }
@@ -263,7 +265,7 @@ const HomePage = () => {
                     .values-row-container { overflow-x: scroll; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-bottom: 1rem; scrollbar-width: none; -ms-overflow-style: none; }
                     .values-row-container::-webkit-scrollbar { display: none; }
                     .values-row { display: flex; gap: 1.5rem; padding: 0 10%; justify-content: flex-start; }
-                    .value-card { flex-shrink: 0; width: 80%; height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1.5rem; background-color: var(--brand-light); border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); border: 2px solid transparent; scroll-snap-align: center; transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease; }
+                    .value-card { flex-shrink: 0; width: 80%; height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1.5rem; background-color: var(--brand-light); border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); border: 2px solid transparent; scroll-snap-align: center; transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease; cursor: pointer; }
                     .value-card:hover { transform: translateY(-5px); box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15); }
                     .value-card.active { border-color: var(--brand-primary); }
                     .value-card h4 { font-size: 24px; font-weight: 600; margin-bottom: 0.5rem; }
@@ -274,7 +276,7 @@ const HomePage = () => {
                     .services-section { padding: 3rem 1.5rem; max-width: 1280px; margin: 0 auto; text-align: center; }
                     .services-section h2 { margin-bottom: 3rem; }
                     .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
-                    .service-card { display: flex; flex-direction: column; text-align: left; padding: 2rem; background-color: var(--brand-light); border: 1px solid var(--divider-gray); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-decoration: none; color: inherit; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; }
+                    .service-card { display: flex; flex-direction: column; text-align: left; padding: 2rem; background-color: var(--brand-light); border: 1px solid var(--divider-gray); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-decoration: none; color: inherit; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; height: 75%; }
                     .service-card:hover { transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-color: var(--brand-primary); }
                     .service-card-icon { color: var(--brand-primary); width: 40px; height: 40px; margin-bottom: 1.5rem; }
                     .service-card h4 { font-size: 20px; font-weight: 600; margin-bottom: 0.5rem; color: var(--brand-dark); }
@@ -301,7 +303,15 @@ const HomePage = () => {
                         .mobile-menu-button-container { display: none; }
                         .nav-links-center { display: flex; align-items: center; }
                         .nav-contact-link { display: block; }
-                        .hero-content { flex-direction: row; justify-content: flex-start; align-items: center; min-height: 600px; background-size: contain; background-position: right center; }
+                        .hero-content { 
+                            flex-direction: row; 
+                            justify-content: flex-start; 
+                            align-items: center; 
+                            min-height: 600px; 
+                            background-image: url('/Affexmedia icons/Landing page girl 1.png');
+                            background-size: contain; 
+                            background-position: right center; 
+                        }
                         .hero-text { text-align: left; max-width: 40%; width: auto; align-self: center; margin-left: 10%; padding: 2rem; height: auto; }
                         .hero-text h2 { font-size: clamp(2.5rem, 8vw, 4.0625rem); }
                         .hero-text p { font-size: 28px; }
@@ -317,37 +327,43 @@ const HomePage = () => {
                         .values-row-container { max-width: none; }
                         .values-row { justify-content: flex-start; }
                         .value-card { min-width: 300px; width: 300px; }
-                        .services-grid { grid-template-columns: repeat(3, 1fr); }
+                        .services-grid { 
+                            grid-template-columns: repeat(5, 1fr); 
+                            gap: 1rem; 
+                        }
+                        .service-card {
+                            padding: 1.5rem; 
+                        }
+                        .service-card-icon {
+                            width: 32px;
+                            height: 32px;
+                            margin-bottom: 1rem;
+                        }
+                        .service-card h4 {
+                            font-size: 18px; 
+                        }
+                        .service-card p {
+                            font-size: 14px; 
+                        }
                     }
                 `}
             </style>
             
             <AnimatePresence>
                 {isLoading && (
-                    <motion.div
-                        className="preloader"
-                        key="preloader"
-                        initial={{ opacity: 1 }}
-                        exit={{}} // Exit handled by children
-                    >
+                    <motion.div className="preloader" key="preloader" initial={{ opacity: 1 }} exit={{}}>
+                        <motion.div className="loader-panel" exit={{ y: '-100%', transition: { duration: 0.8, ease: [0.87, 0, 0.13, 1], delay: 0.4 } }}/>
                         <motion.div
                             className="loader-panel"
-                            exit={{ y: '-100%', transition: { duration: 0.8, ease: [0.87, 0, 0.13, 1], delay: 0.4 } }}
-                        />
-                        <motion.div
-                            className="loader-panel"
-                            initial={{
-                                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-                                display: 'flex', justifyContent: 'center', alignItems: 'center'
-                            }}
+                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                             animate={{ opacity: [0, 1, 1, 0], transition: { duration: 2.2, times: [0, 0.2, 0.8, 1] } }}
                         >
-                            <h1 className="loader-text">AffixxMedia</h1>
+                            <div className="loader-content">
+                                <img src="/Affexmedia icons/logo-png.png" alt="AffixxMedia Logo" className="loader-logo" />
+                                <h1 className="loader-text">AffixxMedia</h1>
+                            </div>
                         </motion.div>
-                        <motion.div
-                            className="loader-panel"
-                            exit={{ y: '100%', transition: { duration: 0.8, ease: [0.87, 0, 0.13, 1], delay: 0.4 } }}
-                        />
+                        <motion.div className="loader-panel" exit={{ y: '100%', transition: { duration: 0.8, ease: [0.87, 0, 0.13, 1], delay: 0.4 } }}/>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -581,12 +597,16 @@ const HomePage = () => {
                         transition={{ duration: 1 }}
                     >
                         <div className="values-row">
-                            <div className={`value-card ${activeValueIndex === 0 ? 'active' : ''}`}><h4>Collaboration Wins</h4><p>We believe anyone can succeed with the right team, and we strive to be that team for every client.</p></div>
-                            <div className={`value-card ${activeValueIndex === 1 ? 'active' : ''}`}><h4>Integrity in Value</h4><p>We welcome negotiation in strategies, never in the value we deliver.</p></div>
-                            <div className={`value-card ${activeValueIndex === 2 ? 'active' : ''}`}><h4>Mutual Understanding</h4><p>We understand our clients and help them clearly understand the process, goals, and results.</p></div>
-                            <div className={`value-card ${activeValueIndex === 3 ? 'active' : ''}`}><h4>Creative Clarity</h4><p>We combine bold ideas with strategic focus — because creativity without purpose is just noise.</p></div>
-                            <div className={`value-card ${activeValueIndex === 4 ? 'active' : ''}`}><h4>Results Matter</h4><p>Our success is measured by the impact we create for our clients, not by vanity metrics.</p></div>
-                            <div className={`value-card ${activeValueIndex === 5 ? 'active' : ''}`}><h4>Transparency Always</h4><p>We believe in open communication, honest feedback, and earning trust through every interaction.</p></div>
+                            {coreValues.map((value, index) => (
+                                <div
+                                    key={value.title}
+                                    className={`value-card ${activeValueIndex === index ? 'active' : ''}`}
+                                    onClick={() => handleValueCardClick(index)}
+                                >
+                                    <h4>{value.title}</h4>
+                                    <p>{value.description}</p>
+                                </div>
+                            ))}
                         </div>
                     </motion.div>
                 </section>

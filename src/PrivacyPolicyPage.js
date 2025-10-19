@@ -326,7 +326,7 @@ const PrivacyPolicyPage = () => {
                     <h1>
                         <span>Privacy</span> <span style={{ fontWeight: 300,color: '#313131' }}>Policy</span>
                     </h1>
-                    <p className="effective-date">Effective Date: June 15, 2025</p>
+                    <p className="effective-date">Effective Date: October 31, 2025</p>
                     <p>At Affixxmedia, we value your privacy. This policy explains how we collect, use, and protect your personal information.</p>
 
                     <hr />
