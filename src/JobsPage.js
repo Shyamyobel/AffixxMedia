@@ -149,7 +149,7 @@ const JobsPage = () => {
                     .no-scroll { overflow: hidden; }
                     .header { position: relative; background-color: var(--brand-light); padding: 0.5rem 1.5rem; z-index: 50; }
                     .nav-container { display: flex; align-items: center; max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
-                    .logo { font-size: 1.5rem; font-weight: 700; color: var(--brand-primary); text-decoration: none; }
+                    .logo { font-size: 1.5rem; font-weight: 700; color: var(--brand-primary); text-decoration: none; font-family: 'Gilroy';}
                     .nav-links-center { display: none; gap: 3rem; margin: 0 auto; transform: translateX(7rem); }
                     .nav-links-center a, .nav-contact-link, .services-dropdown-trigger { text-decoration: none; color: var(--brand-dark); font-weight: 500; font-size: 18px; transition: color 0.3s ease; padding: 0.5rem 0; background: none; border: none; font-family: inherit; cursor: pointer; }
                     .nav-links-center a:hover, .nav-contact-link:hover, .services-dropdown-trigger:hover { color: var(--brand-primary); }
@@ -170,7 +170,7 @@ const JobsPage = () => {
                     .mobile-menu-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 60; }
                     .mobile-menu-panel { position: fixed; top: 0; right: 0; width: 85%; max-width: 350px; height: 100%; background-color: var(--brand-light); box-shadow: -5px 0 15px rgba(0,0,0,0.1); z-index: 70; display: flex; flex-direction: column; }
                     .mobile-menu-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid var(--divider-gray); }
-                    .mobile-menu-header .logo { font-size: 1.25rem; }
+                    .mobile-menu-header .logo { font-size: 1.25rem; font-family: 'Gilroy';}
                     .close-menu-button { background: none; border: none; padding: 0.5rem; cursor: pointer; }
                     .close-icon { width: 28px; height: 28px; color: var(--brand-dark); }
                     .mobile-nav-links { padding: 1rem 1.5rem; list-style: none; margin: 0; flex-grow: 1; overflow-y: auto; }
@@ -182,9 +182,20 @@ const JobsPage = () => {
                     .mobile-submenu { list-style: none; padding-left: 1.5rem; margin: 0; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
                     .mobile-submenu.open { max-height: 500px; }
                     .mobile-submenu a { font-size: 1rem; font-weight: 400; color: #4B5563; padding-top: 0.75rem; padding-bottom: 0.75rem; }
-                    .mobile-menu-footer { padding: 1.5rem; margin-top: auto; border-top: 1px solid var(--divider-gray); }
-                    .mobile-contact-button { display: block; width: 100%; padding: 0.75rem 1.5rem; background-color: var(--brand-primary); color: var(--brand-light); text-align: center; text-decoration: none; border-radius: 9999px; font-weight: 600; transition: opacity 0.3s ease; }
-                    .mobile-contact-button:hover { opacity: 0.9; }
+                    .mobile-menu-footer { padding: 1.5rem; margin-top: auto; border-top: 1px solid var(--divider-gray); display: flex;  justify-content: center;}
+                    .mobile-contact-button { 
+    /* 🌟 CHANGED: Set a max-width to make it smaller */
+    max-width: 200px; 
+    width: 100%; 
+    padding: 0.6rem 1.25rem; /* 🌟 CHANGED: Smaller padding */
+    background-color: var(--brand-primary); 
+    color: var(--brand-light); 
+    text-align: center; 
+    text-decoration: none; 
+    border-radius: 9999px; 
+    font-weight: 600; 
+    transition: opacity 0.3s ease; 
+}.mobile-contact-button:hover { opacity: 0.9; }
                     .footer { background-color: #1a1a1a; background-image: linear-gradient(to top left, rgba(255, 255, 255, 0.05) 49.9%, transparent 50%), linear-gradient(to bottom right, rgba(255, 255, 255, 0.03) 49.9%, transparent 50%); color: #EAEAEA; padding: 4rem 1.5rem 1.5rem; margin-top: auto; font-size: 14px; font-weight: 300; }
                     .footer-container { max-width: 1280px; margin: 0 auto; display: grid; gap: 2rem; grid-template-columns: 1fr; }
                     .footer-column .footer-logo-img { width: 120px; height: auto; margin-bottom: 1rem; }

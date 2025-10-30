@@ -28,6 +28,7 @@ const App = () => {
                 <Route path="/TermsAndConditionsPage" element={<TermsAndConditionsPage />} />
                 <Route path="/BlogPage" element={<BlogPage />} />
                 <Route path="/WorksPage" element={<WorksPage />} />
+                <Route path="*" element={<NotFoundPage />} /> 
             </Routes>
         </Router>
     );

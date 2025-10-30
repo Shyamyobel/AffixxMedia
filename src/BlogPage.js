@@ -516,8 +516,20 @@ const BlogPage = () => {
                     .mobile-submenu { list-style: none; padding-left: 1.5rem; margin: 0; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
                     .mobile-submenu.open { max-height: 500px; }
                     .mobile-submenu a { font-size: 1rem; font-weight: 400; color: #4B5563; padding-top: 0.75rem; padding-bottom: 0.75rem; }
-                    .mobile-menu-footer { padding: 1.5rem; margin-top: auto; border-top: 1px solid var(--divider-gray); }
-                    .mobile-contact-button { display: block; width: 100%; padding: 0.75rem 1.5rem; background-color: var(--brand-primary); color: var(--brand-light); text-align: center; text-decoration: none; border-radius: 9999px; font-weight: 600; transition: opacity 0.3s ease; }
+                    .mobile-menu-footer { padding: 1.5rem; margin-top: auto; border-top: 1px solid var(--divider-gray); display: flex;  justify-content: center;}
+                    .mobile-contact-button { 
+    /* 🌟 CHANGED: Set a max-width to make it smaller */
+    max-width: 200px; 
+    width: 100%; 
+    padding: 0.6rem 1.25rem; /* 🌟 CHANGED: Smaller padding */
+    background-color: var(--brand-primary); 
+    color: var(--brand-light); 
+    text-align: center; 
+    text-decoration: none; 
+    border-radius: 9999px; 
+    font-weight: 600; 
+    transition: opacity 0.3s ease; 
+}
                     .mobile-contact-button:hover { opacity: 0.9; }
                     .footer { background-color: #1a1a1a; background-image: linear-gradient(to top left, rgba(255, 255, 255, 0.05) 49.9%, transparent 50%), linear-gradient(to bottom right, rgba(255, 255, 255, 0.03) 49.9%, transparent 50%); color: #EAEAEA; padding: 4rem 1.5rem 1.5rem; margin-top: auto; font-size: 14px; font-weight: 300; }
                     .footer-container { max-width: 1280px; margin: 0 auto; display: grid; gap: 2rem; grid-template-columns: 1fr; }
